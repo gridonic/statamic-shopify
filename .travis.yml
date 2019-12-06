@@ -12,14 +12,15 @@ install:
     # Install Statamic
     - cd ../..
     - ~/.config/composer/vendor/bin/statamic new statamic-addon-test --no-interaction
+    - cd statamic-addon-test
 
     # Copy addon to site/addons
     - mkdir -p site/addons/Shopify
     - cp -R $TRAVIS_BUILD_DIR/* site/addons/Shopify
     - php please update:addons
 
-    # Install dev dependencies of Statamic
-    - cd statamic-addon-test/statamic && composer install
+    # Install dev dependencies to get php unit
+    - cd statamic && composer install
     - cd ../
 
 script:
