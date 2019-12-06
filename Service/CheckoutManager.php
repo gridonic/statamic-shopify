@@ -19,7 +19,7 @@ class CheckoutManager
      */
     private $checkoutClient;
 
-    public function __construct(CheckoutClient $checkoutClient)
+    public function __construct(CheckoutClientInterface $checkoutClient)
     {
         $this->checkoutClient = $checkoutClient;
     }
