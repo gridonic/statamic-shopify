@@ -1,0 +1,25 @@
+language: php
+
+php:
+    - '7.1.18'
+    - '7.2'
+    - '7.3'
+
+install:
+    # Install Statamic CLI
+    - composer global require statamic/cli
+
+    # Install Statamic
+    - cd ../..
+    - ~/.config/composer/vendor/bin/statamic new statamic-addon-test --no-interaction
+
+    # Install dev dependencies of Statamic
+    - cd statamic-addon-test/statamic && composer install
+    - cd ../
+
+    # Copy addon to site/addons
+    - mkdir -p site/addons/Shopify
+    - cp -R $TRAVIS_BUILD_DIR/* site/addons/Shopify
+
+script:
+    - statamic/vendor/bin/phpunit --group shopify
