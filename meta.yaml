@@ -1,0 +1,6 @@
+name: Shopify
+description: Provides Shopify integration for Statamic.
+version: '1.0.0'
+developer: Gridonic
+developer_url: 'https://gridonic.ch'
+commercial: true

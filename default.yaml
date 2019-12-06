@@ -1,0 +1,8 @@
+store_url: ''
+api_key: ''
+password: ''
+shared_secret: ''
+storefront_access_token: ''
+rate_limiting_enable: false
+cart_api_enable: false
+suggest_mode_products_label: '{{ title }} ({{ product_type }})'

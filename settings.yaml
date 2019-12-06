@@ -1,0 +1,44 @@
+fields:
+  section_general:
+    display: General
+    type: section
+  store_url:
+    display: Store URL
+    instructions: '`storename.myshopify.com`'
+    type: text
+    width: 50
+  api_key:
+    display: API Key
+    type: text
+    width: 50
+  password:
+    display: Password
+    type: text
+    width: 50
+  shared_secret:
+    display: Shared Secret
+    type: text
+    width: 50
+  storefront_access_token:
+    display: Storefront Access Token
+    instructions: 'Needed if you want to create checkouts, as they can only be created via storefront API.'
+    type: text
+    width: 50
+  rate_limiting_enable:
+    display: Enable rate limiting
+    instructions: |
+      Enable a basic rate limiter to ensure you do not exceed the limit of API calls.
+
+      On non-Plus plans, you get 1 call every `500ms`, for Plus plans you get 2 calls every `500ms`.
+      The cycle is set to `500ms`, with a buffer for safety of `100ms` added on.
+    type: toggle
+  cart_api_enable:
+    type: toggle
+    display: Enable shopping cart API
+    instructions: Toggle to expose the shopping cart API via `/!/Shopify` route. If disabled, all urls throw 404s.
+  section_suggest_modes:
+    display: Suggest Modes
+    type: section
+  suggest_mode_products_label:
+    display: Products label
+    instructions: Antlers string how to render the label when displaying Shopify products in suggest fields (when using the `shopify.products` mode).

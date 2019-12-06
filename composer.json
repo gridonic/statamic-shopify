@@ -1,0 +1,8 @@
+{
+  "name": "gridonic/statamic-shopify",
+  "require": {
+    "php": ">=7.1",
+    "ext-json": "*",
+    "ohmybrew/basic-shopify-api": "~6.1"
+  }
+}
