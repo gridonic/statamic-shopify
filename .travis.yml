@@ -20,6 +20,7 @@ install:
     # Copy addon to site/addons
     - mkdir -p site/addons/Shopify
     - cp -R $TRAVIS_BUILD_DIR/* site/addons/Shopify
+    - php please update:addons
 
 script:
     - statamic/vendor/bin/phpunit --group shopify
