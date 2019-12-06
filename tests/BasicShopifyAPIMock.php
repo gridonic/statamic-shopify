@@ -58,7 +58,7 @@ class BasicShopifyAPIMock extends BasicShopifyAPI
         return (object) [
             'errors'     => false,
             'body'       => (object) $body,
-            'link' => [
+            'link' => (object) [
                 'next' => 'nextLink',
                 'previous' => 'previousLink',
             ],

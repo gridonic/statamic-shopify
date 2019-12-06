@@ -32,5 +32,6 @@ class CheckoutClientMock implements CheckoutClientInterface
      */
     public function update(array $cartItems, string $checkoutId): ResponseInterface
     {
+        return new Response();
     }
 }
