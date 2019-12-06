@@ -1,6 +1,7 @@
 # Shopify
 
 [![Statamic 2](https://img.shields.io/badge/Statamic-2.10-orange.svg)](https://statamic.com)
+[![Build Status](https://travis-ci.org/gridonic/statamic-shopify.svg?branch=master)](https://travis-ci.org/gridonic/statamic-shopify)
 
 A Shopify integration for Statamic 2 ✌️
 
