@@ -189,11 +189,16 @@ class ShopifyTags extends Tags
             return null;
         }
 
-        // Store in blink cache (cached per request).
+        // Store product data in blink cache (cached per request).
         $this->blink->put("shopify.product.id.{$product->id}", $product);
         $this->blink->put("shopify.product.handle.{$product->handle}", $product);
 
-        $serialized = $this->productSerializer->serialize($product);
+        // Get the serialized product data from cache blink cache. If not already cached, store it.
+        $serialized = $this->blink->get("shopify.product.{$product->id}.serialized");
+        if (!$serialized) {
+            $serialized = $this->productSerializer->serialize($product);
+            $this->blink->put("shopify.product.{$product->id}.serialized", $serialized);
+        }
 
         if ($this->getParamBool('as_json')) {
             return json_encode($serialized);

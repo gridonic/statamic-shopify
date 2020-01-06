@@ -86,6 +86,13 @@ class ShopifyRepository
         return $this->getAllWithMultipleRequests('/admin/api/collects.json', 'collects', $params);
     }
 
+    public function getMetaFields(string $resource, int $id): array
+    {
+        $result = $this->client->rest('GET', sprintf('/admin/%s/%s/metafields.json', $resource, $id));
+
+        return $this->getSingle($result, 'metafields');
+    }
+
     private function getPaginatedItems(string $endpoint, string $resourceName, array $params = [], string $pageInfo = null): PaginatedItems
     {
         // When the page info is present, Shopify does not allow other parameters than the limit.
