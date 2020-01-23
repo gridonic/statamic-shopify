@@ -4,6 +4,7 @@ namespace Statamic\Addons\Shopify;
 
 use Illuminate\Http\JsonResponse;
 use Statamic\Addons\Shopify\Model\CartItem;
+use Statamic\Addons\Shopify\Model\SerializationContext;
 use Statamic\Addons\Shopify\Service\CartManager;
 use Statamic\Addons\Shopify\Service\CartSerializer;
 use Statamic\Addons\Shopify\Service\ShopifyRepository;
@@ -44,8 +45,10 @@ class ShopifyController extends Controller
         $this->throw404IfDisabled();
 
         $cartItems = $this->cartManager->get();
+        $context = new SerializationContext(SerializationContext::CONTEXT_PRODUCT_VARIANT_CART);
+        $serialized = $this->cartSerializer->serializeCartItems($cartItems, $context);
 
-        return new JsonResponse($this->cartSerializer->serializeCartItems($cartItems));
+        return new JsonResponse($serialized);
     }
 
     public function postCart($variationId, $quantity)

@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Statamic\Addons\Shopify\Event\ProductsTagEvent;
 use Statamic\Addons\Shopify\Exception\ShopifyApiException;
 use Statamic\Addons\Shopify\Model\PaginatedItems;
+use Statamic\Addons\Shopify\Model\SerializationContext;
 use Statamic\Addons\Shopify\Service\CartManager;
 use Statamic\Addons\Shopify\Service\CartSerializer;
 use Statamic\Addons\Shopify\Service\CheckoutManager;
@@ -85,6 +86,7 @@ class ShopifyTags extends Tags
      *  - paginated <bool>: True to enable pagination.
      *  - pagination_query_string <string>: The query string holding the page info, when using pagination.
      *  - as_json <bool>: Whether to return the data as JSON.
+     *  - serialization_context_id <string>: An optional context id passed to the serializer when serializing product data.
      *
      * Example:
      *
@@ -97,12 +99,13 @@ class ShopifyTags extends Tags
         $paginationQueryString = $this->getParam('pagination_query_string', 'products_page');
         $asJson = $this->getParamBool('as_json', false);
         $sortByCollection = $this->getParamBool('sort_by_collection');
+        $serializationContextId = $this->getParam('serialization_context_id', SerializationContext::CONTEXT_PRODUCT_LIST);
 
         if ($shouldPaginate) {
             $pageInfo = request()->get('products_page', null);
             try {
                 $paginatedItems = $this->shopifyRepository->getProductsPaginated($filters, $pageInfo);
-                $output = $this->getPaginatedOutput($paginatedItems, $paginationQueryString, 'products');
+                $output = $this->getPaginatedOutput($paginatedItems, $paginationQueryString, 'products', $serializationContextId);
             } catch (ShopifyApiException $exception) {
                 // If the page info query string is not valid, fail silently.
                 if ($this->isInvalidPageInfo($exception)) {
@@ -122,7 +125,7 @@ class ShopifyTags extends Tags
             $products = $this->sortProductsByCollectionId($products, $filters['collection_id']);
         }
 
-        $serializedProducts = $this->serializeProducts($products->all());
+        $serializedProducts = $this->serializeProducts($products->all(), $serializationContextId);
 
         if ($asJson) {
             return json_encode($serializedProducts);
@@ -141,14 +144,18 @@ class ShopifyTags extends Tags
      *  - product_id <int>: The id of the product.
      *  - filter <string>: Key value pair of filters, separated with "&".
      *  - as_json <bool>: Whether to return the data as JSON.
+     *  - serialization_context_id <string>: An optional context id passed to the serializer when serializing product data.
      */
     public function productVariants()
     {
         $productId = $this->getParamInt('product_id');
         $variants = $this->shopifyRepository->getProductVariants($productId, $this->buildFilters());
+        $serializationContextId = $this->getParam('serialization_context_id', SerializationContext::CONTEXT_PRODUCT_VARIANT_LIST);
 
-        $serialized = collect($variants)->map(function ($variant) {
-            return $this->productVariantSerializer->serialize($variant);
+        $context = new SerializationContext($serializationContextId);
+
+        $serialized = collect($variants)->map(function ($variant) use ($context) {
+            return $this->productVariantSerializer->serialize($variant, $context);
         })->values()->all();
 
         if ($this->getParamBool('as_json')) {
@@ -168,6 +175,7 @@ class ShopifyTags extends Tags
      *  - handle <string>: The handle of the product.
      *  - as_json <bool>: Whether to return the data as JSON.
      *  - throw_404 <bool>: Whether to throw a 404 exception if the product is not found.
+     *  - serialization_context_id <string>: An optional context id passed to the serializer when serializing product data.
      */
     public function product()
     {
@@ -196,7 +204,9 @@ class ShopifyTags extends Tags
         // Get the serialized product data from cache blink cache. If not already cached, store it.
         $serialized = $this->blink->get("shopify.product.{$product->id}.serialized");
         if (!$serialized) {
-            $serialized = $this->productSerializer->serialize($product);
+            $serializationContextId = $this->getParam('serialization_context_id', SerializationContext::CONTEXT_PRODUCT_DETAIL);
+            $context = new SerializationContext($serializationContextId);
+            $serialized = $this->productSerializer->serialize($product, $context);
             $this->blink->put("shopify.product.{$product->id}.serialized", $serialized);
         }
 
@@ -216,6 +226,7 @@ class ShopifyTags extends Tags
      *  - id <int>: The ID of the product variant.
      *  - as_json <bool>: Whether to return the data as JSON.
      *  - throw_404 <bool>: Whether to throw a 404 exception if the variant is not found.
+     *  - serialization_context_id <string>: An optional context id passed to the serializer when serializing product data.
      */
     public function productVariant()
     {
@@ -229,7 +240,9 @@ class ShopifyTags extends Tags
             return null;
         }
 
-        $serialized = $this->productVariantSerializer->serialize($variant);
+        $serializationContextId = $this->getParam('serialization_context_id', SerializationContext::CONTEXT_PRODUCT_VARIANT_DETAIL);
+        $context = new SerializationContext($serializationContextId);
+        $serialized = $this->productVariantSerializer->serialize($variant, $context);
 
         if ($this->getParamBool('as_json')) {
             return json_encode($serialized);
@@ -366,24 +379,26 @@ class ShopifyTags extends Tags
         $filterParts = explode('&', $this->getParam('filters'));
 
         collect($filterParts)->each(function ($filterPart) use (&$filters) {
-            list($name, $value) = explode('=', $filterPart);
+            [$name, $value] = explode('=', $filterPart);
             $filters[$name] = $value;
         });
 
         return $filters;
     }
 
-    private function serializeProducts(array $products): array
+    private function serializeProducts(array $products, string $serializationContextId): array
     {
-        return collect($products)->map(function ($product) {
-            return $this->productSerializer->serialize($product);
+        $context = new SerializationContext($serializationContextId);
+
+        return collect($products)->map(function ($product) use ($context) {
+            return $this->productSerializer->serialize($product, $context);
         })->values()->all();
     }
 
-    private function getPaginatedOutput(PaginatedItems $paginatedItems, string $paginationQueryString, string $itemsKey): array
+    private function getPaginatedOutput(PaginatedItems $paginatedItems, string $paginationQueryString, string $itemsKey, string $serializationContextId): array
     {
         $products = $paginatedItems->getItems();
-        $serializedProducts = $this->serializeProducts($products);
+        $serializedProducts = $this->serializeProducts($products, $serializationContextId);
         $queryStrings = request()->query();
 
         $previousLink = $paginatedItems->getPreviousLink();

@@ -3,6 +3,7 @@
 namespace Statamic\Addons\Shopify\Service;
 
 use Statamic\Addons\Shopify\Model\CartItem;
+use Statamic\Addons\Shopify\Model\SerializationContext;
 
 class CartSerializer
 {
@@ -35,9 +36,11 @@ class CartSerializer
                 return false;
             }
 
+            $context = new SerializationContext(SerializationContext::CONTEXT_PRODUCT_VARIANT_CART);
+
             return [
                 'quantity' => $cartItem->getQuantity(),
-                'variant' => $this->productVariantSerializer->serialize($variant),
+                'variant' => $this->productVariantSerializer->serialize($variant, $context),
             ];
         })->filter()->values()->all();
     }

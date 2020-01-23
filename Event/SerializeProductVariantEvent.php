@@ -2,6 +2,7 @@
 
 namespace Statamic\Addons\Shopify\Event;
 
+use Statamic\Addons\Shopify\Model\SerializationContext;
 use Statamic\Events\Event;
 
 class SerializeProductVariantEvent extends Event
@@ -16,10 +17,16 @@ class SerializeProductVariantEvent extends Event
      */
     private $productVariant;
 
-    public function __construct($productVariant, array $data)
+    /**
+     * @var SerializationContext
+     */
+    private $serializationContext;
+
+    public function __construct($productVariant, array $data, SerializationContext $context)
     {
         $this->data = $data;
         $this->productVariant = $productVariant;
+        $this->serializationContext = $context;
     }
 
     public function getData(): array
@@ -35,5 +42,10 @@ class SerializeProductVariantEvent extends Event
     public function getProductVariant()
     {
         return $this->productVariant;
+    }
+
+    public function getSerializationContext(): SerializationContext
+    {
+        return $this->serializationContext;
     }
 }
