@@ -95,7 +95,7 @@ class CheckoutClient implements CheckoutClientInterface
 
     private function getGraphQLUrl(): string
     {
-        return 'https://' . $this->client->getShop() . '/api/2019-07/graphql';
+        return sprintf('https://%s/api/%s/graphql', $this->client->getShop(), $this->client->getVersion());
     }
 
     private function buildCreateCheckoutQuery(array $cartItems): string

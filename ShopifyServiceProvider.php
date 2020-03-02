@@ -15,7 +15,7 @@ use Statamic\Extend\ServiceProvider;
 class ShopifyServiceProvider extends ServiceProvider
 {
     // The API version used for the API calls.
-    const SHOPIFY_API_VERSION = '2019-10';
+    const SHOPIFY_API_VERSION = '2020-01';
 
     protected $defer = true;
 

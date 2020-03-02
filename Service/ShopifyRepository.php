@@ -81,9 +81,17 @@ class ShopifyRepository
         return $this->getMany($result, 'collection_listings');
     }
 
+    /**
+     * @deprecated Use ShopifyRepository::getProductsOfCollection instead.
+     */
     public function getProductCollets(array $params): array
     {
-        return $this->getAllWithMultipleRequests('/admin/api/collects.json', 'collects', $params);
+        return $this->getProductsOfCollection($params['collection_id']);
+    }
+
+    public function getProductsOfCollection(int $collectionId): array
+    {
+        return $this->getAllWithMultipleRequests(sprintf('/admin/api/collections/%s/products.json', $collectionId), 'products');
     }
 
     public function getMetaFields(string $resource, int $id): array
@@ -143,7 +151,7 @@ class ShopifyRepository
         throw new ShopifyApiException($result->exception->getMessage(), 0, $result->exception);
     }
 
-    private function getAllWithMultipleRequests(string $endpoint, string $resourceName, array $params): array
+    private function getAllWithMultipleRequests(string $endpoint, string $resourceName, array $params = []): array
     {
         // Shopify returns at max 250 products per API request, so we might have to perform multiple ones.
         if (!isset($params['limit'])) {

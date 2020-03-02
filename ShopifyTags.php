@@ -431,15 +431,13 @@ class ShopifyTags extends Tags
 
     private function sortProductsByCollectionId(Collection $products, $collectionId): Collection
     {
-        $productCollects = collect($this->shopifyRepository->getProductCollets([
-            'collection_id' => $collectionId,
-        ]));
+        $productCollects = collect($this->shopifyRepository->getProductsOfCollection($collectionId));
 
         $productsSorted = collect();
 
         $productCollects->each(function ($productCollect) use ($productsSorted, $products) {
             $product = $products->filter(function ($product) use ($productCollect) {
-                return $product->id === $productCollect->product_id;
+                return $product->id === $productCollect->id;
             })->first();
             $productsSorted->push($product);
         });
