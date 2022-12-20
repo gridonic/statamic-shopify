@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2022-12-20
+
+### Changed
+
+* Use API version `2022-10` for Shopify api calls
+
 ## [1.0.1] - 2020-03-02
 
 ### Changed
@@ -16,6 +22,7 @@
 
 * Initial release of the addon 🐣
 
-[Unreleased]: https://github.com/gridonic/statamic-shopify/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/gridonic/statamic-shopify/compare/v1.0.2...HEAD
 [1.0.0]: https://github.com/gridonic/statamic-shopify/releases/tag/v1.0.0
 [1.0.1]: https://github.com/gridonic/statamic-shopify/releases/tag/v1.0.1
+[1.0.2]: https://github.com/gridonic/statamic-shopify/releases/tag/v1.0.2
